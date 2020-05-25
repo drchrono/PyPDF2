@@ -65,6 +65,7 @@ import codecs
 from .generic import *
 from .utils import readNonWhitespace, readUntilWhitespace, ConvertFunctionsToVirtualList
 from .utils import isString, b_, u_, ord_, chr_, str_, formatWarning
+from .perms import get_perm_value_as_int
 
 if version_info < ( 2, 4 ):
    from sets import ImmutableSet as frozenset
@@ -395,7 +396,7 @@ class PdfFileWriter(object):
         self.cloneReaderDocumentRoot(reader)
         self.appendPagesFromReader(reader, after_page_append)
 
-    def encrypt(self, user_pwd, owner_pwd = None, use_128bit = True):
+    def encrypt(self, user_pwd, owner_pwd = None, use_128bit = True, perm_mask=-1):
         """
         Encrypt this PDF file with the PDF Standard encryption handler.
 
@@ -407,6 +408,8 @@ class PdfFileWriter(object):
         :param bool use_128bit: flag as to whether to use 128bit
             encryption.  When false, 40bit encryption will be used.  By default,
             this flag is on.
+        :param int perm_mask: Bitwise OR of permissions. For example PyPDF2.PERM_MODIFY_TEXT | PyPDF2.PERM_PRINT
+            for print and modify permissions
         """
         import time, random
         if owner_pwd == None:
@@ -419,8 +422,10 @@ class PdfFileWriter(object):
             V = 1
             rev = 2
             keylen = int(40 / 8)
-        # permit everything:
-        P = -1
+        # Permission according to the mask
+        P = perm_mask
+        if P >= 0:
+            P = get_perm_value_as_int(perm_mask)
         O = ByteStringObject(_alg33(owner_pwd, user_pwd, rev, keylen))
         ID_1 = ByteStringObject(md5(b_(repr(time.time()))).digest())
         ID_2 = ByteStringObject(md5(b_(repr(random.random()))).digest())
