@@ -2115,7 +2115,19 @@ class PdfFileReader(object):
         return U == real_U, key
 
     def getIsEncrypted(self):
-        return "/Encrypt" in self.trailer
+        """
+        We use check this in many places assuming it will return the current
+        status of the document, when in fact is returning the initial state.
+        The fact that the method name is "getIsEncrypted" is misleading.
+        """
+        return "/Encrypt" in self.trailer and not hasattr(self, '_decryption_key')
+
+    def isCurrentlyEncrypted(self):
+        """
+        I created this method to get the current status of the file to solve the ambiguity
+        between the current status and the original file
+        """
+        return self.getIsEncrypted() and not hasattr(self, '_decryption_key')
 
     isEncrypted = property(lambda self: self.getIsEncrypted(), None, None)
     """

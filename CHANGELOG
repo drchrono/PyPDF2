@@ -1,4 +1,9 @@
-﻿Version 1.26.0, 2016-05-18
+﻿Version 1.26.1, 2024-07-17
+--------------------------
+
+ - Added isCurrentlyEncrypted to PdfFileReader to return the current encryption status
+
+Version 1.26.0, 2016-05-18
 --------------------------
 
  - NOTE: Active maintenance on PyPDF2 is resuming after a hiatus
