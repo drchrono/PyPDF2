@@ -1158,6 +1158,11 @@ class PdfFileReader(object):
         self.stream = stream
 
         self._override_encryption = False
+        if self.isEncrypted:
+            # Some files say that are encrypted but they really ain't.
+            # Try to decrypt with empty password.
+            self.decrypt("")
+
 
     def getDocumentInfo(self):
         """
@@ -2120,7 +2125,7 @@ class PdfFileReader(object):
         status of the document, when in fact is returning the initial state.
         The fact that the method name is "getIsEncrypted" is misleading.
         """
-        return "/Encrypt" in self.trailer and not hasattr(self, '_decryption_key')
+        return "/Encrypt" in self.trailer
 
     def isCurrentlyEncrypted(self):
         """
